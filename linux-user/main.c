@@ -743,7 +743,7 @@ int main(int argc, char **argv, char **envp)
     qemu_plugin_load_list(&plugins, &error_fatal);
 
     /* Initialize the symbolic backend */
-    _sym_initialize();
+    _sym_initialize(qemu_log_symqemu_pre_check, qemu_log_symqemu_post_check);
 
     /* Zero out regs */
     memset(regs, 0, sizeof(struct target_pt_regs));

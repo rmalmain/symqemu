@@ -984,6 +984,8 @@ cpu_exec_loop(CPUState *cpu, SyncClocks *sc)
                 break;
             }
 
+            qemu_log_symqemu_event("gen","start");
+
             tb = tb_lookup(cpu, pc, cs_base, flags, cflags);
             if (tb == NULL) {
                 CPUJumpCache *jc;
@@ -1019,7 +1021,11 @@ cpu_exec_loop(CPUState *cpu, SyncClocks *sc)
                 tb_add_jump(last_tb, tb_exit, tb);
             }
 
+            qemu_log_symqemu_event("gen","end");
+
+            qemu_log_symqemu_event("exec","start");
             cpu_loop_exec_tb(cpu, tb, pc, &last_tb, &tb_exit);
+            qemu_log_symqemu_event("exec","end");
 
             /* Try to align the host and virtual clocks
                if the guest is in advance */

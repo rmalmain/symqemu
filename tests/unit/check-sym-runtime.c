@@ -367,7 +367,7 @@ int main(int argc, char* argv[])
 {
     g_test_init(&argc, &argv, NULL);
     fclose(stdin);              /* for the Qsym backend */
-    _sym_initialize();
+    _sym_initialize(NULL, NULL);
 
 #define REGISTER_TEST(name) g_test_add_func("/sym/" #name, name##_test)
     REGISTER_TEST(add);

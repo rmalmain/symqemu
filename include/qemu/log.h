@@ -37,6 +37,7 @@ bool qemu_log_separate(void);
 #define LOG_PER_THREAD     (1 << 20)
 #define CPU_LOG_TB_VPU     (1 << 21)
 #define LOG_TB_OP_PLUGIN   (1 << 22)
+#define LOG_SYMQEMU        (1 << 23)
 
 /* Lock/unlock output. */
 
@@ -44,6 +45,19 @@ FILE *qemu_log_trylock(void) G_GNUC_WARN_UNUSED_RESULT;
 void qemu_log_unlock(FILE *fd);
 
 /* Logging functions: */
+
+#define qemu_log_symqemu_event(evt, status)             \
+    do {                                                \
+        struct timespec ts;                             \
+        clock_gettime(CLOCK_REALTIME, &ts);            \
+                                                        \
+        uint64_t evt_time =                             \
+            ts.tv_sec * 1000000000 + ts.tv_nsec;     \
+                                                        \
+        qemu_log_mask(LOG_SYMQEMU,                      \
+            evt "_" status ",%lu\n", evt_time);          \
+    } while (0)
+
 
 /* log only if a bit is set on the current loglevel mask:
  * @mask: bit to check in the mask
@@ -94,5 +108,8 @@ int qemu_str_to_log_mask(const char *str);
  * to the specified FILE*.
  */
 void qemu_print_log_usage(FILE *f);
+
+void qemu_log_symqemu_pre_check(void);
+void qemu_log_symqemu_post_check(void);
 
 #endif

@@ -96,7 +96,7 @@ static FILE *qemu_log_trylock_with_err(Error **errp)
         if (log_per_thread) {
             g_autofree char *filename
                 = g_strdup_printf(global_filename, log_thread_id());
-            logfile = fopen(filename, "w");
+            logfile = fopen(filename, "a");
             if (!logfile) {
                 error_setg_errno(errp, errno,
                                  "Error opening logfile %s for thread %d",
@@ -317,7 +317,7 @@ static bool qemu_set_log_internal(const char *filename, bool changed_name,
                 }
                 qemu_log_unlock(logfile);
             } else {
-                logfile = fopen(filename, "w");
+                logfile = fopen(filename, "a");
                 if (!logfile) {
                     error_setg_errno(errp, errno, "Error opening logfile %s",
                                      filename);
@@ -503,6 +503,8 @@ const QEMULogItem qemu_log_items[] = {
       "open a separate log file per thread; filename must contain '%d'" },
     { CPU_LOG_TB_VPU, "vpu",
       "include VPU registers in the 'cpu' logging" },
+    { LOG_SYMQEMU, "symqemu",
+      "logs symqemu performance. time is in ns since epoch, with the format '<event>_(start|end),<time>'" },
     { 0, NULL, NULL },
 };
 
@@ -555,4 +557,14 @@ void qemu_print_log_usage(FILE *f)
     fprintf(f, "trace:PATTERN   enable trace events\n");
     fprintf(f, "\nUse \"-d trace:help\" to get a list of trace events.\n\n");
 #endif
+}
+
+void qemu_log_symqemu_pre_check(void)
+{
+    qemu_log_symqemu_event("solver","start");
+}
+
+void qemu_log_symqemu_post_check(void)
+{
+    qemu_log_symqemu_event("solver","end");
 }

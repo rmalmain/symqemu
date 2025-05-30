@@ -9159,7 +9159,10 @@ static abi_long do_syscall1(CPUArchState *cpu_env, int num, abi_long arg1,
         } else {
             if (!(p = lock_user(VERIFY_WRITE, arg2, arg3, 0)))
                 return -TARGET_EFAULT;
+
             ret = get_errno(read_symbolized(arg1, p, arg3));
+            qemu_log_symqemu_event("boot", "end");
+
             if (ret >= 0 &&
                 fd_trans_host_to_target_data(arg1)) {
                 ret = fd_trans_host_to_target_data(arg1)(p, ret);
